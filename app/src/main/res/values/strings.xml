@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SYM-Labo2</string>
+    <string name="btn_async">Asynchrone</string>
+    <string name="btn_differ">Différée</string>
+    <string name="btn_serial">Sérialisation</string>
+    <string name="btn_compress">Compressée</string>
+    <string name="btn_graphql">GraphQL</string>
 </resources>
