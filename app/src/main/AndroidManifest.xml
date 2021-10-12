@@ -10,6 +10,26 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SYMLabo2">
         <activity
+            android:name=".GraphqlActivity"
+            android:exported="true" />
+        <activity
+            android:name=".CompressActivity"
+            android:exported="true" />
+        <activity
+            android:name=".SerializeActivity"
+            android:exported="true" />
+        <activity
+            android:name=".DifferActivity"
+            android:exported="true" />
+        <activity
+            android:name=".AsyncActivity"
+            android:exported="true" />
+        <activity
+            android:name=".async"
+            android:exported="true"
+            android:label="@string/title_activity_async"
+            android:theme="@style/Theme.SYMLabo2.NoActionBar" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
