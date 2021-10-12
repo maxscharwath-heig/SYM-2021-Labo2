@@ -14,31 +14,31 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/async_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_async" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/differ_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_differ" />
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/serialize_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_serial" />
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/compress_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_compress" />
 
         <Button
-            android:id="@+id/button5"
+            android:id="@+id/graphql_btn"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:text="@string/btn_graphql" />
