@@ -18,8 +18,6 @@ class AsyncActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
         val mcm = SymComManager();
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: String) {
