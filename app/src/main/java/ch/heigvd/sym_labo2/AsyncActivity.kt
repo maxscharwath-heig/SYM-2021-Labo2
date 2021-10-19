@@ -25,7 +25,7 @@ class AsyncActivity : AppCompatActivity() {
                 println(response)
             }
         })
-        mcm.sendRequest("http://mobile.iict.ch/api/txt","Yolololol")
+        mcm.sendRequest("http://mobile.iict.ch/api/txt","Yolololol", "text/plain")
 
 
     }

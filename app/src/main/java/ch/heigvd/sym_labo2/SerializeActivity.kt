@@ -55,7 +55,7 @@ class SerializeActivity : AppCompatActivity() {
                     textResult2.text = result.surname
                 }
             })
-            mcm.sendJsonRequest("http://mobile.iict.ch/api/json",json)
+            mcm.sendRequest("http://mobile.iict.ch/api/json", json, "application/json")
 
 
 

@@ -46,7 +46,7 @@ class DifferActivity : AppCompatActivity() {
                         requestResultTextView.setText(response)
                     }
                 })
-                mcm.sendRequest("http://mobile.iict.ch/api/txt", content)
+                mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
             }
             else {
                 writeRequestToFile(this, content)
