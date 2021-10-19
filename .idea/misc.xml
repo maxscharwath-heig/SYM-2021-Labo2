@@ -3,13 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_async.xml" value="0.17572463768115942" />
         <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_compress.xml" value="0.1" />
+        <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_differ.xml" value="0.165" />
         <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_graphql.xml" value="0.1" />
         <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/Nicolas Crausaz/Documents/_dev/SYM-Labo2/app/src/main/res/layout/activity_serialize.xml" value="0.1" />
       </map>
     </option>
   </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

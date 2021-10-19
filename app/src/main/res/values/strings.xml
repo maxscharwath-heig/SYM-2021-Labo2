@@ -5,4 +5,7 @@
     <string name="btn_serial">Sérialisation</string>
     <string name="btn_compress">Compressée</string>
     <string name="btn_graphql">GraphQL</string>
+    <string name="btn_send">Envoyer</string>
+    <string name="input_request_content">Contenu de la requête</string>
+    <string name="input_request_result">Résultat de la requête</string>
 </resources>
