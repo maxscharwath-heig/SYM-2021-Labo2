@@ -5,7 +5,11 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-class SymComManager(var communicationEventListener: CommunicationEventListener? = null) {
+class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
+
+    fun setCommunicationListener(communicationEventListener: CommunicationEventListener){
+        this.communicationEventListener = communicationEventListener
+    }
 
     fun sendRequest(url: String, request: String) {
         val data = request.toByteArray(StandardCharsets.UTF_8)
@@ -20,7 +24,6 @@ class SymComManager(var communicationEventListener: CommunicationEventListener? 
         outputStream.flush()
         val responseReader = connection.inputStream.bufferedReader()
         val response = responseReader.readText();
-        println(response)
         communicationEventListener?.handleServerResponse(response)
     }
 
