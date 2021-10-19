@@ -39,4 +39,20 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
         thread.start()
     }
 
+    fun sendJsonRequest(url: String, request: String) {
+        val data = request.toByteArray(StandardCharsets.UTF_8)
+
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Content-Type","application/json")
+        connection.setRequestProperty("Content-Length",data.size.toString())
+
+        val outputStream = DataOutputStream(connection.outputStream)
+        outputStream.write(data)
+        outputStream.flush()
+        val responseReader = connection.inputStream.bufferedReader()
+        val response = responseReader.readText();
+        communicationEventListener?.handleServerResponse(response)
+    }
+
 }
