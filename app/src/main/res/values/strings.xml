@@ -12,4 +12,5 @@
     <string name="btn_send">Envoyer</string>
     <string name="input_request_content">Contenu de la requête</string>
     <string name="input_request_result">Résultat de la requête</string>
+    <string name="no_network_warn">Pas de connexion, utilisation de WorkManager</string>
 </resources>
