@@ -2,18 +2,23 @@ package ch.heigvd.sym_labo2
 
 import android.content.Context
 import android.os.StrictMode
-import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
-    override fun doWork(): Result {
-        // Retrieve requests from file
-        val content = RequestFileHandler.retrieveStoredRequests(applicationContext)
+    companion object {
+        const val REQ_KEY = "requests"
+    }
 
-//        for (req in content) {
-//            sendRequest(req)
-//        }
+    override fun doWork(): Result {
+
+        val retrievedRequests = inputData.getStringArray(REQ_KEY)
+
+        if (retrievedRequests != null) {
+            for (req in retrievedRequests) {
+                sendRequest(req)
+            }
+        }
 
         // For now, just doing the first line
         //val res =
@@ -22,7 +27,6 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
 
         // TODO: Find a way to detect if there are errors in sending
         // return Result.retry()
-        //val test = workDataOf
 
         return Result.success()
     }

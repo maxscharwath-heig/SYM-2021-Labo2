@@ -9,6 +9,7 @@ import android.net.ConnectivityManager
 import android.os.StrictMode
 import android.util.Log
 import androidx.work.*
+import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.REQ_KEY
 
 
 class DifferActivity : AppCompatActivity() {
@@ -16,6 +17,8 @@ class DifferActivity : AppCompatActivity() {
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
     private lateinit var noNetworkWarningTextView: TextView
+
+    private var pendingRequests = mutableListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,20 +33,19 @@ class DifferActivity : AppCompatActivity() {
 
             val content = requestContentTextView.text.toString()
 
-            // La condition est inversée juste pour tester le WorkManager
+            // TODO: La condition est inversée juste pour tester le WorkManager
             if (!isNetworkAvailable(applicationContext)) {
                 // Internet is available, sending request
                 sendRequest(content)
 
             } else {
                 noNetworkWarningTextView.text = getString(R.string.no_network_warn)
-                RequestFileHandler.writeRequestToFile(this, content)
-                val request: WorkRequest = OneTimeWorkRequestBuilder<DifferRequestWorker>().build()
-                WorkManager.getInstance(this).enqueue(request)
+                pendingRequests.add(content)
 
-                Log.d("state: ",
-                    WorkManager.getInstance(this).getWorkInfoById(request.id).get().state.toString()
-                )
+                val request = OneTimeWorkRequest.Builder(DifferRequestWorker::class.java)
+                val data = Data.Builder().putStringArray(REQ_KEY, pendingRequests.toTypedArray())
+                request.setInputData(data.build())
+                WorkManager.getInstance(this).enqueue(request.build())
             }
         }
     }
