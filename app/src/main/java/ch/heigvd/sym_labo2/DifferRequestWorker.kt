@@ -2,8 +2,10 @@ package ch.heigvd.sym_labo2
 
 import android.content.Context
 import android.os.StrictMode
+import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     companion object {
@@ -16,18 +18,17 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
 
         if (retrievedRequests != null) {
             for (req in retrievedRequests) {
-                sendRequest(req)
+                try {
+                    Log.d("Trying to send", req)
+                    val result = sendRequest(req)
+                    return Result.success(workDataOf("result" to result))
+
+                } catch (e : Exception) {
+                    Log.d("failed", req)
+                    return Result.retry()
+                }
             }
         }
-
-        // For now, just doing the first line
-        //val res =
-        // sendRequest("coucou")
-
-
-        // TODO: Find a way to detect if there are errors in sending
-        // return Result.retry()
-
         return Result.success()
     }
 

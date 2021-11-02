@@ -30,22 +30,36 @@ class DifferActivity : AppCompatActivity() {
         noNetworkWarningTextView = findViewById(R.id.no_network_warning)
 
         sendButton.setOnClickListener {
+            // TODO: Try to send, if error, use workmanager
 
             val content = requestContentTextView.text.toString()
 
-            // TODO: La condition est inversée juste pour tester le WorkManager
-            if (!isNetworkAvailable(applicationContext)) {
+            if (isNetworkAvailable(applicationContext)) {
                 // Internet is available, sending request
+                noNetworkWarningTextView.text = ""
                 sendRequest(content)
 
             } else {
                 noNetworkWarningTextView.text = getString(R.string.no_network_warn)
                 pendingRequests.add(content)
 
-                val request = OneTimeWorkRequest.Builder(DifferRequestWorker::class.java)
+                val constraints =
+                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
                 val data = Data.Builder().putStringArray(REQ_KEY, pendingRequests.toTypedArray())
-                request.setInputData(data.build())
-                WorkManager.getInstance(this).enqueue(request.build())
+
+                val request = OneTimeWorkRequestBuilder<DifferRequestWorker>()
+                    .setConstraints(constraints)
+                    .setInputData(data.build())
+                    .build()
+
+                WorkManager.getInstance(this).enqueue(request)
+                WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
+                    .observe(this, { workInfo ->
+                        if (workInfo != null && workInfo.state.isFinished) {
+                            requestResultTextView.text = workInfo.outputData.getString(REQ_KEY)
+                            pendingRequests.clear()
+                        }
+                    })
             }
         }
     }
