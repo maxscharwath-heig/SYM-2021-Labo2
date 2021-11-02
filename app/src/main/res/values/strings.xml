@@ -5,12 +5,12 @@
     <string name="btn_serial">Sérialisation</string>
     <string name="btn_compress">Compressée</string>
     <string name="btn_graphql">GraphQL</string>
-    <string name="serialize_hint1">Name</string>
-    <string name="serialize_hint2">Surname</string>
-    <string name="serialize_send">Send</string>
+    <string name="serialize_hint1">Nom</string>
+    <string name="serialize_hint2">Nom de famille</string>
     <string name="no_data">null</string>
     <string name="btn_send">Envoyer</string>
     <string name="input_request_content">Contenu de la requête</string>
     <string name="input_request_result">Résultat de la requête</string>
     <string name="no_network_warn">Pas de connexion, utilisation de WorkManager</string>
+    <string name="data_choice">Choisissez ici le type d\'objet à envoyer</string>
 </resources>
