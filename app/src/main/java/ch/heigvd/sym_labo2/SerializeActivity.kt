@@ -1,10 +1,8 @@
 package ch.heigvd.sym_labo2
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.StrictMode
-import android.util.Log
 import android.util.Xml
 import android.widget.Button
 import kotlinx.serialization.Serializable
@@ -14,41 +12,39 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
 import kotlinx.serialization.decodeFromString
-import android.widget.AdapterView
 
-import android.view.View
-import android.widget.AdapterView.OnItemSelectedListener
-import org.xmlpull.v1.XmlPullParser
+import ch.heigvd.sym_labo2.model.Phone
+import org.w3c.dom.Text
 import java.io.StringWriter
-
-import org.xmlpull.v1.XmlSerializer
-
-
-
 
 
 class SerializeActivity : AppCompatActivity() {
 
 
     private lateinit var sendBtn : Button
-    private lateinit var editData1 : EditText
-    private lateinit var editData2 : EditText
-    private lateinit var textResult1 : TextView
-    private lateinit var textResult2 : TextView
+    private lateinit var dataName : EditText
+    private lateinit var dataFirstName : EditText
+    private lateinit var dataPhone1 : EditText
+    private lateinit var dataPhone2 : EditText
+    private lateinit var dataPhone3 : EditText
+    private lateinit var result : TextView
+
     private lateinit var spinner : Spinner
 
     @Serializable
-    data class Data(val name: String, val surname: String)
+    data class Data(val name: String, val firstName: String, val phone1: String, val phone2: String, val phone3: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_serialize)
 
         sendBtn = findViewById(R.id.btn_send)
-        editData1 = findViewById(R.id.input_data1)
-        editData2 = findViewById(R.id.input_data2)
-        textResult1 = findViewById(R.id.textView_result1)
-        textResult2 = findViewById(R.id.textView_result2)
+        dataName = findViewById(R.id.input_data_name)
+        dataFirstName = findViewById(R.id.input_data_firstName)
+        dataPhone1 = findViewById(R.id.input_data_phone1)
+        dataPhone2 = findViewById(R.id.input_data_phone1)
+        dataPhone3 = findViewById(R.id.input_data_phone1)
+        result = findViewById(R.id.result)
         spinner = findViewById(R.id.spinner)
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
@@ -56,62 +52,71 @@ class SerializeActivity : AppCompatActivity() {
         val stringArray = resources.getStringArray(R.array.data_array)
 
         sendBtn.setOnClickListener {
-            var name = editData1.text.toString()
-            var surname = editData2.text.toString()
-            Log.d("test", name)
-            Log.d("test", surname)
-            if (spinner.selectedItem.toString() == stringArray[0]){
+            var person = ch.heigvd.sym_labo2.model.Person(dataName.text.toString()
+                , dataFirstName.text.toString(),
+                mutableListOf(Phone(dataPhone1.text.toString(),
+                Phone.Type.home), Phone(dataPhone2.text.toString(),
+                Phone.Type.mobile), Phone(dataPhone3.text.toString(),
+                Phone.Type.work)
+            ))
+                when {
+                spinner.selectedItem.toString() == stringArray[0] -> {
 
-                val json = Json.encodeToString(Data(name, surname))
+                    val json = Json.encodeToString(Data(person.name, person.firstName,
+                        person.phones[0].number, person.phones[1].number, person.phones[2].number))
 
-                mcm.setCommunicationListener(object : CommunicationEventListener {
-                    override fun handleServerResponse(response: String) {
-                        val result = Json.decodeFromString<Data>(response)
-                        textResult1.text = result.name
-                        textResult2.text = result.surname
-                    }
-                })
+                    mcm.setCommunicationListener(object : CommunicationEventListener {
+                        override fun handleServerResponse(response: String) {
+                            val jsonResult = Json.decodeFromString<Data>(response)
+                            var resultPerson = ch.heigvd.sym_labo2.model.Person(jsonResult.name
+                                , jsonResult.firstName,
+                                mutableListOf(
+                                    Phone(
+                                        jsonResult.phone1,
+                                        Phone.Type.home
+                                    ),
+                                    Phone(
+                                        jsonResult.phone2,
+                                        Phone.Type.mobile
+                                    ),
+                                    Phone(
+                                        jsonResult.phone3,
+                                        Phone.Type.work,
+                                    )
+                                )
+                            )
+                            result.text = resultPerson.toString()
+                        }
+                    })
 
-                mcm.sendRequest("http://mobile.iict.ch/api/json", json, "application/json")
+                    mcm.sendRequest("http://mobile.iict.ch/api/json", json, "application/json")
 
-            } else if(spinner.selectedItem.toString() == stringArray[1]) {
+                }
+                spinner.selectedItem.toString() == stringArray[1] -> {
+                    val xmlSerializer = Xml.newSerializer()
+                    val writer = StringWriter()
+                    xmlSerializer.setOutput(writer)
+                    xmlSerializer.startDocument("UTF-8", false)
+                    xmlSerializer.docdecl(" directory SYSTEM \"http://mobile.iict.ch/directory.dtd\"")
+                    xmlSerializer.startTag("", "directory")
+                    person.toXml(xmlSerializer)
+                    xmlSerializer.endTag("", "directory")
+                    xmlSerializer.endDocument()
+                    var toSend = writer.toString()
 
-                val xmlSerializer = Xml.newSerializer()
-                val xmlParser = Xml.newPullParser()
-                val writer = StringWriter()
-                xmlSerializer.setOutput(writer)
-                xmlSerializer.startDocument("UTF-8", true)
-                xmlSerializer.setFeature(
-                    "http://xmlpull.org/v1/doc/features.html#indent-output",
-                    true
-                )
-                xmlSerializer.docdecl("http://mobile.iict.ch/directory.dtd")
-                xmlSerializer.startTag("", "directory")
-                xmlSerializer.startTag("","person")
-                xmlSerializer.startTag("", "name")
-                xmlSerializer.text(name)
-                xmlSerializer.endTag("", "name")
-                xmlSerializer.startTag("", "firstname")
-                xmlSerializer.text(surname)
-                xmlSerializer.endTag("", "firstname")
-                xmlSerializer.endTag("", "person")
-                xmlSerializer.endTag("", "directory")
-                xmlSerializer.endDocument()
+                    mcm.setCommunicationListener(object : CommunicationEventListener {
+                        override fun handleServerResponse(response: String) {
+                            org.xml.sax.InputSource(response)
+                            result.text = response
+                        }
+                    })
 
-                val toSend = writer.
+                    mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend , "application/xml")
 
-                mcm.setCommunicationListener(object : CommunicationEventListener {
-                    override fun handleServerResponse(response: String) {
-                       // textResult1.text = xmlParser.getAttributeValue(null, "name")
-                        // textResult2.text = xmlParser.getAttributeValue(null, "surname")
-                        textResult2.text = response
-                    }
-                })
+                }
+                spinner.selectedItem.toString() == stringArray[2] -> {
 
-                mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend , "application/xml")
-
-            } else if (spinner.selectedItem.toString() == stringArray[2]){
-
+                }
             }
         }
     }
