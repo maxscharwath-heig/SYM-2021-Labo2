@@ -56,7 +56,8 @@ class DifferActivity : AppCompatActivity() {
                 WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
                     .observe(this, { workInfo ->
                         if (workInfo != null && workInfo.state.isFinished) {
-                            requestResultTextView.text = workInfo.outputData.getString(REQ_KEY)
+                            Log.d("Result", workInfo.outputData.getString(REQ_KEY).toString())
+                            requestResultTextView.text = workInfo.outputData.getString(REQ_KEY).toString()
                             pendingRequests.clear()
                         }
                     })

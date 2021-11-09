@@ -1,11 +1,18 @@
 package ch.heigvd.sym_labo2
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.os.StrictMode
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import java.lang.Compiler.command
+
+
+
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     companion object {
@@ -20,11 +27,28 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
             for (req in retrievedRequests) {
                 try {
                     Log.d("Trying to send", req)
-                    val result = sendRequest(req)
+
+                    var result = ""
+                    val mcm = SymComManager()
+                    mcm.setCommunicationListener(object : CommunicationEventListener {
+                        override fun handleServerResponse(response: String) {
+                            Log.d("Reponse id ", response)
+
+                            result = response
+                        }
+                    })
+
+
+
+                    mcm.sendRequest("http://mobile.iict.ch/api/txt", req, "text/plain")
+
+                    Log.d("HEEEEEEEEEEEEEEEEE", "EEEEEEEEEE")
+                    Log.d("sent", result)
+
                     return Result.success(workDataOf("result" to result))
 
                 } catch (e : Exception) {
-                    Log.d("failed", req)
+                    Log.d("failed", e.toString())
                     return Result.retry()
                 }
             }
@@ -43,6 +67,7 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
                 result = response
             }
         })
+
         mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
         return result
     }
