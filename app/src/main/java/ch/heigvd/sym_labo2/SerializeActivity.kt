@@ -1,6 +1,5 @@
 package ch.heigvd.sym_labo2
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.StrictMode
@@ -33,7 +32,7 @@ class SerializeActivity : AppCompatActivity() {
         sendBtn = findViewById(R.id.btn_send)
         editData1 = findViewById(R.id.input_data1)
         editData2 = findViewById(R.id.input_data2)
-        textResult1 = findViewById(R.id.textView_result1)
+        textResult1 = findViewById(R.id.textView_result)
         textResult2 = findViewById(R.id.textView_result2)
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)

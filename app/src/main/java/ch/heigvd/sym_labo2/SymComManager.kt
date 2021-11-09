@@ -31,7 +31,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
             outputStream.flush()
             val responseReader = connection.inputStream.bufferedReader()
             val response = responseReader.readText();
-            //I use handler to edit something in the main thead because you cant edit ui from another thread
+            //I use handler to edit something in the main thread because you cant edit ui from another thread
             handler.post(Runnable {
                 communicationEventListener?.handleServerResponse(response)
             })
