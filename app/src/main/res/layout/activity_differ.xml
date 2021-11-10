@@ -35,11 +35,6 @@
             android:layout_width="match_parent"
             android:layout_height="69dp" />
 
-        <TextView
-            android:id="@+id/no_network_warning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <EditText
             android:id="@+id/request_result_text"
             android:layout_width="match_parent"

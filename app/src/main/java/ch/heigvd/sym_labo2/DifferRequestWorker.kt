@@ -1,48 +1,57 @@
 package ch.heigvd.sym_labo2
 
 import android.content.Context
-import android.os.StrictMode
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import java.io.DataOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.nio.charset.StandardCharsets
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     companion object {
-        const val REQ_KEY = "requests"
+        const val KEY_INPUT  = "requests"
+        const val KEY_RESULT = "result"
     }
 
     override fun doWork(): Result {
 
-        val retrievedRequests = inputData.getStringArray(REQ_KEY)
+        val retrievedRequests = inputData.getStringArray(KEY_INPUT)
 
         if (retrievedRequests != null) {
             for (req in retrievedRequests) {
-                sendRequest(req)
+                try {
+                    Log.d("Trying to send", req)
+                    val result = sendRequest("http://mobile.iict.ch/api/txt", req)
+                    val output: Data = workDataOf(KEY_RESULT to result)
+                    return Result.success(output)
+
+                } catch (e : Exception) {
+                    Log.d("failed", e.toString())
+                    return Result.retry()
+                }
             }
         }
-
-        // For now, just doing the first line
-        //val res =
-        // sendRequest("coucou")
-
-
-        // TODO: Find a way to detect if there are errors in sending
-        // return Result.retry()
-
         return Result.success()
     }
 
-    private fun sendRequest(content: String): String {
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-        var result = ""
+    private fun sendRequest(url: String, request: String): String {
+        val data = request.toByteArray(StandardCharsets.UTF_8)
 
-        val mcm = SymComManager()
-        mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
-                result = response
-            }
-        })
-        mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
-        return result
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.requestMethod = "POST";
+        connection.setRequestProperty("Content-Type", "text/plain")
+        connection.setRequestProperty("Content-Length", data.size.toString())
+
+        val outputStream = DataOutputStream(connection.outputStream)
+        outputStream.write(data)
+        outputStream.flush()
+        val responseReader = connection.inputStream.bufferedReader()
+        return responseReader.readText();
     }
 }

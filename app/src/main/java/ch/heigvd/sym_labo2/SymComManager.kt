@@ -1,6 +1,7 @@
 package ch.heigvd.sym_labo2
 
 import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
@@ -8,13 +9,13 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 
 class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
+    private val handler = Handler(Looper.getMainLooper())
 
     fun setCommunicationListener(communicationEventListener: CommunicationEventListener) {
         this.communicationEventListener = communicationEventListener
     }
 
     fun sendRequest(url: String, request: String, contentType: String) {
-        val handler = Handler()
         val thread = Thread {
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
@@ -30,7 +31,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
             outputStream.write(data)
             outputStream.flush()
             val responseReader = connection.inputStream.bufferedReader()
-            val response = responseReader.readText();
+            val response = responseReader.readText()
             //I use handler to edit something in the main thead because you cant edit ui from another thread
             handler.post(Runnable {
                 communicationEventListener?.handleServerResponse(response)
