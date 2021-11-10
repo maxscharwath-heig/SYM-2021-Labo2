@@ -13,4 +13,6 @@
     <string name="input_request_content">Contenu de la requête</string>
     <string name="input_request_result">Résultat de la requête</string>
     <string name="no_network_warn">Pas de connexion, utilisation de WorkManager</string>
+    <string name="graphql_step_one">1. Choose an author</string>
+    <string name="graphql_step_two">2. Choose a author\'s book</string>
 </resources>

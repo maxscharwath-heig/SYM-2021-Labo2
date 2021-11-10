@@ -1,26 +1,35 @@
 package ch.heigvd.sym_labo2
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import android.widget.ArrayAdapter
 
 class GraphqlActivity : AppCompatActivity() {
-    private lateinit var sendBtn : Button
-    private lateinit var textResult : TextView
+    private lateinit var authorSpinner: Spinner
+    private lateinit var bookListView: ListView
+    private val mcm: SymComManager = SymComManager()
 
     data class Query(val query: String);
 
-    data class Book(val id:String, val title:String, val isbn13:String, val languageCode:String, val numPages:Int, val publicationDate:String, val publisher:String, val textReviewsCount:Int, val averageRating:Float){
+    data class Book(
+        val id: String,
+        val title: String,
+        val isbn13: String,
+        val languageCode: String,
+        val numPages: Int,
+        val publicationDate: String,
+        val publisher: String,
+        val textReviewsCount: Int,
+        val averageRating: Float
+    ) {
         override fun toString(): String {
             return title
         }
     }
 
-    data class Author(val id:String, val name:String, val books:ArrayList<Book>){
+    data class Author(val id: String, val name: String, val books: ArrayList<Book>) {
         override fun toString(): String {
             return name
         }
@@ -43,44 +52,63 @@ class GraphqlActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_graphql)
-        sendBtn = findViewById(R.id.btn_send)
-        textResult = findViewById(R.id.textView_result)
-
-        val mcm = SymComManager();
+        authorSpinner = findViewById(R.id.spinner_author)
+        bookListView = findViewById(R.id.list_book)
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: String) {
                 val result = Gson().fromJson(response, AuthorsResponse::class.java)
-                val list = findViewById<ListView>(R.id.list_item)
-                val adapter: ArrayAdapter<Author> = ArrayAdapter(this@GraphqlActivity, android.R.layout.simple_list_item_1, result.data.authors)
-                list.adapter = adapter;
-                list.setOnItemClickListener { parent, view, position, id ->
-                    val author = list.getItemAtPosition(position) as Author;
-                    textResult.text = author.name;
-                    getAuthorBooks(author.id);
+
+                Toast.makeText(
+                    applicationContext,
+                    "Found ${result.data.authors.size} authors",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val adapter: ArrayAdapter<Author> = ArrayAdapter(
+                    this@GraphqlActivity,
+                    android.R.layout.simple_list_item_1,
+                    result.data.authors
+                )
+                authorSpinner.adapter = adapter;
+                authorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    private var lastSelection: Int = -1
+                    override fun onItemSelected(
+                        parent: AdapterView<*>,
+                        view: View,
+                        position: Int,
+                        id: Long
+                    ) {
+                        if (lastSelection == position) return;
+                        lastSelection = position;
+                        val author = authorSpinner.getItemAtPosition(position) as Author;
+                        getAuthorBooks(author.id);
+                    }
+
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
                 }
             }
         })
 
-
-
-        sendBtn.setOnClickListener{
-            val json = Gson().toJson(Query("{authors:findAllAuthors{id, name, books{id}}}"))
-            textResult.text=json
-            mcm.sendRequest("http://mobile.iict.ch/graphql",json, "application/json")
-        }
+        val json = Gson().toJson(Query("{authors:findAllAuthors{id, name, books{id}}}"))
+        mcm.sendRequest("http://mobile.iict.ch/graphql", json, "application/json")
     }
 
     private fun getAuthorBooks(authorId:String){
-        val mcm = SymComManager();
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: String) {
                 val result = Gson().fromJson(response, AuthorResponse::class.java)
-                val list = findViewById<ListView>(R.id.list_item)
-                val adapter: ArrayAdapter<Book> = ArrayAdapter(this@GraphqlActivity, android.R.layout.simple_list_item_1, result.data.author.books)
-                list.adapter = adapter;
-                list.setOnItemClickListener { parent, view, position, id ->
-                    val book = list.getItemAtPosition(position) as Book;
-                    textResult.text = book.title;
+                Toast.makeText(
+                    applicationContext,
+                    "Found ${result.data.author.books.size} books",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val adapter: ArrayAdapter<Book> = ArrayAdapter(
+                    this@GraphqlActivity,
+                    android.R.layout.simple_list_item_1,
+                    result.data.author.books
+                )
+                bookListView.adapter = adapter;
+                bookListView.setOnItemClickListener { parent, view, position, id ->
+                    val book = bookListView.getItemAtPosition(position) as Book;
                 }
 
             }
