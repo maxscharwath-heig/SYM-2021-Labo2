@@ -17,4 +17,6 @@
     <string name="cached_req_done">La requête différée à bien été terminée</string>
     <string name="blank_input">Le contenu de la requête est vide !</string>
     <string name="data_choice">Choisissez ici le type d\'objet à envoyer</string>
+    <string name="graphql_step_one">1. Choisis un auteur</string>
+    <string name="graphql_step_two">2. Choisis un livre de l\'auteur</string>
 </resources>
