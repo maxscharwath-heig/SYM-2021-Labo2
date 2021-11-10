@@ -23,6 +23,7 @@ import javax.xml.parsers.DocumentBuilder
 
 import javax.xml.parsers.DocumentBuilderFactory
 import android.R.xml
+import org.w3c.dom.Node
 
 import java.io.StringReader
 
@@ -58,8 +59,8 @@ class SerializeActivity : AppCompatActivity() {
         dataName = findViewById(R.id.input_data_name)
         dataFirstName = findViewById(R.id.input_data_firstName)
         dataPhone1 = findViewById(R.id.input_data_phone1)
-        dataPhone2 = findViewById(R.id.input_data_phone1)
-        dataPhone3 = findViewById(R.id.input_data_phone1)
+        dataPhone2 = findViewById(R.id.input_data_phone2)
+        dataPhone3 = findViewById(R.id.input_data_phone3)
         result = findViewById(R.id.result)
         spinner = findViewById(R.id.spinner)
 
@@ -85,7 +86,9 @@ class SerializeActivity : AppCompatActivity() {
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
                         override fun handleServerResponse(response: String) {
+
                             val jsonResult = Json.decodeFromString<Data>(response)
+
                             var resultPerson = ch.heigvd.sym_labo2.model.Person(jsonResult.name
                                 , jsonResult.firstName,
                                 mutableListOf(
@@ -129,18 +132,31 @@ class SerializeActivity : AppCompatActivity() {
                             val input = InputSource()
                             input.setCharacterStream(StringReader(response))
                             val d = doc.parse(input)
-                            val elements    = d.documentElement.firstChild.childNodes
-                            val test = elements.toString()
+                            val nameElements = d.getElementsByTagName("name")
+                            val firstNameElements = d.getElementsByTagName("firstname")
+                            val phoneElements = d.getElementsByTagName("phone")
 
-
-
-
-                            result.text = response
+                            var resultPerson = ch.heigvd.sym_labo2.model.Person(nameElements.item(0).textContent
+                                , firstNameElements.item(0).textContent,
+                                mutableListOf(
+                                    Phone(
+                                        phoneElements.item(0).textContent,
+                                        Phone.Type.valueOf(phoneElements.item(0).attributes.item(0).textContent)
+                                    ),
+                                    Phone(
+                                        phoneElements.item(1).textContent,
+                                        Phone.Type.valueOf(phoneElements.item(1).attributes.item(0).textContent)
+                                    ),
+                                    Phone(
+                                        phoneElements.item(2).textContent,
+                                        Phone.Type.valueOf(phoneElements.item(2).attributes.item(0).textContent)
+                                    )
+                                )
+                            )
+                            result.text = resultPerson.toString()
                         }
                     })
-
                     mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend , "application/xml")
-
                 }
                 spinner.selectedItem.toString() == stringArray[2] -> {
 

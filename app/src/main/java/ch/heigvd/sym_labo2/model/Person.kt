@@ -4,6 +4,8 @@ import android.util.Xml
 import org.xmlpull.v1.XmlSerializer
 import java.io.StringWriter
 
+
+//TODO dataclass?
 class Person(val name:String, val firstName: String, val phones: List<Phone>) {
 
     override fun toString(): String {
