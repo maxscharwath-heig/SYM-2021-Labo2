@@ -54,37 +54,33 @@ class GraphqlActivity : AppCompatActivity() {
         setContentView(R.layout.activity_graphql)
         authorSpinner = findViewById(R.id.spinner_author)
         bookListView = findViewById(R.id.list_book)
+        val authorAdapter = ArrayAdapter<Author>(
+            this@GraphqlActivity, android.R.layout.simple_list_item_1
+        );
+        authorSpinner.adapter = authorAdapter;
+        authorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                val author = authorSpinner.getItemAtPosition(position) as Author;
+                getAuthorBooks(author.id);
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: String) {
                 val result = Gson().fromJson(response, AuthorsResponse::class.java)
-
+                authorAdapter.clear();
+                authorAdapter.addAll(result.data.authors);
                 Toast.makeText(
                     applicationContext,
                     "Found ${result.data.authors.size} authors",
                     Toast.LENGTH_SHORT
                 ).show()
-                val adapter: ArrayAdapter<Author> = ArrayAdapter(
-                    this@GraphqlActivity,
-                    android.R.layout.simple_list_item_1,
-                    result.data.authors
-                )
-                authorSpinner.adapter = adapter;
-                authorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                    private var lastSelection: Int = -1
-                    override fun onItemSelected(
-                        parent: AdapterView<*>,
-                        view: View,
-                        position: Int,
-                        id: Long
-                    ) {
-                        if (lastSelection == position) return;
-                        lastSelection = position;
-                        val author = authorSpinner.getItemAtPosition(position) as Author;
-                        getAuthorBooks(author.id);
-                    }
-
-                    override fun onNothingSelected(parent: AdapterView<*>?) {}
-                }
             }
         })
 
