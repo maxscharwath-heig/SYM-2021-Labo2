@@ -14,8 +14,25 @@ import android.widget.TextView
 import kotlinx.serialization.decodeFromString
 
 import ch.heigvd.sym_labo2.model.Phone
+import org.w3c.dom.Document
+import org.w3c.dom.Element
 import org.w3c.dom.Text
+import java.io.InputStream
 import java.io.StringWriter
+import javax.xml.parsers.DocumentBuilder
+
+import javax.xml.parsers.DocumentBuilderFactory
+import android.R.xml
+
+import java.io.StringReader
+
+import org.xml.sax.InputSource
+
+
+
+
+
+
 
 
 class SerializeActivity : AppCompatActivity() {
@@ -28,7 +45,6 @@ class SerializeActivity : AppCompatActivity() {
     private lateinit var dataPhone2 : EditText
     private lateinit var dataPhone3 : EditText
     private lateinit var result : TextView
-
     private lateinit var spinner : Spinner
 
     @Serializable
@@ -46,8 +62,10 @@ class SerializeActivity : AppCompatActivity() {
         dataPhone3 = findViewById(R.id.input_data_phone1)
         result = findViewById(R.id.result)
         spinner = findViewById(R.id.spinner)
+
         val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
         StrictMode.setThreadPolicy(policy)
+
         val mcm = SymComManager()
         val stringArray = resources.getStringArray(R.array.data_array)
 
@@ -106,7 +124,17 @@ class SerializeActivity : AppCompatActivity() {
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
                         override fun handleServerResponse(response: String) {
-                            org.xml.sax.InputSource(response)
+                            val docb = DocumentBuilderFactory.newInstance()
+                            val doc = docb.newDocumentBuilder()
+                            val input = InputSource()
+                            input.setCharacterStream(StringReader(response))
+                            val d = doc.parse(input)
+                            val elements    = d.documentElement.firstChild.childNodes
+                            val test = elements.toString()
+
+
+
+
                             result.text = response
                         }
                     })
