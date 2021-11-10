@@ -5,9 +5,10 @@
     <string name="btn_serial">Sérialisation</string>
     <string name="btn_compress">Compressée</string>
     <string name="btn_graphql">GraphQL</string>
-    <string name="serialize_hint1">Name</string>
-    <string name="serialize_hint2">Surname</string>
-    <string name="serialize_send">Send</string>
+    <string name="serialize_hint1">Nom</string>
+    <string name="serialize_hint2">Prénom</string>
+    <string name="serialize_hint3">Numéro de téléphone</string>
+    <string name="result">Result</string>
     <string name="no_data">null</string>
     <string name="btn_send">Envoyer</string>
     <string name="input_request_content">Contenu de la requête</string>
@@ -15,4 +16,5 @@
     <string name="no_network_warn">Pas de connexion, mise en cache …</string>
     <string name="cached_req_done">La requête différée à bien été terminée</string>
     <string name="blank_input">Le contenu de la requête est vide !</string>
+    <string name="data_choice">Choisissez ici le type d\'objet à envoyer</string>
 </resources>
