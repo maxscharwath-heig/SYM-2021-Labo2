@@ -9,7 +9,7 @@ import java.net.URL
 import java.nio.charset.StandardCharsets
 
 class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
-    val handler = Handler(Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
 
     fun setCommunicationListener(communicationEventListener: CommunicationEventListener) {
         this.communicationEventListener = communicationEventListener
@@ -31,7 +31,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
             outputStream.write(data)
             outputStream.flush()
             val responseReader = connection.inputStream.bufferedReader()
-            val response = responseReader.readText();
+            val response = responseReader.readText()
             //I use handler to edit something in the main thead because you cant edit ui from another thread
             handler.post(Runnable {
                 communicationEventListener?.handleServerResponse(response)

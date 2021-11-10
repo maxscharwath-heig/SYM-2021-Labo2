@@ -7,18 +7,22 @@ import android.widget.Button
 import android.widget.TextView
 import android.net.ConnectivityManager
 import android.os.StrictMode
-import android.util.Log
+import android.widget.Toast
 import androidx.work.*
-import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.REQ_KEY
+import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_INPUT
+import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_RESULT
 
 
 class DifferActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
-    private lateinit var noNetworkWarningTextView: TextView
 
     private var pendingRequests = mutableListOf<String>()
+
+    companion object {
+        val CONSTRAINTS = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,47 +31,6 @@ class DifferActivity : AppCompatActivity() {
         sendButton = findViewById(R.id.send_button)
         requestContentTextView = findViewById(R.id.request_content_text)
         requestResultTextView = findViewById(R.id.request_result_text)
-        noNetworkWarningTextView = findViewById(R.id.no_network_warning)
-
-        sendButton.setOnClickListener {
-            // TODO: Try to send, if error, use workmanager
-
-            val content = requestContentTextView.text.toString()
-
-            if (isNetworkAvailable(applicationContext)) {
-                // Internet is available, sending request
-                noNetworkWarningTextView.text = ""
-                sendRequest(content)
-
-            } else {
-                noNetworkWarningTextView.text = getString(R.string.no_network_warn)
-                pendingRequests.add(content)
-
-                val constraints =
-                    Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-                val data = Data.Builder().putStringArray(REQ_KEY, pendingRequests.toTypedArray())
-
-                val request = OneTimeWorkRequestBuilder<DifferRequestWorker>()
-                    .setConstraints(constraints)
-                    .setInputData(data.build())
-                    .build()
-
-                WorkManager.getInstance(this).enqueue(request)
-                WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
-                    .observe(this, { workInfo ->
-                        if (workInfo != null && workInfo.state.isFinished) {
-                            Log.d("Result", workInfo.outputData.getString(REQ_KEY).toString())
-                            requestResultTextView.text = workInfo.outputData.getString(REQ_KEY).toString()
-                            pendingRequests.clear()
-                        }
-                    })
-            }
-        }
-    }
-
-    private fun sendRequest(content: String) {
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
 
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
@@ -75,10 +38,44 @@ class DifferActivity : AppCompatActivity() {
                 requestResultTextView.text = response
             }
         })
-        mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
+
+        sendButton.setOnClickListener {
+            val content = requestContentTextView.text.toString()
+
+            if (content.isBlank()) {
+                Toast.makeText(applicationContext, getString(R.string.blank_input), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (isNetworkAvailable(applicationContext)) {
+                // Internet is available, sending request directly
+                mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
+
+            } else {
+                Toast.makeText(applicationContext, getString(R.string.no_network_warn), Toast.LENGTH_SHORT).show()
+
+                pendingRequests.add(content)
+                val data = Data.Builder().putStringArray(KEY_INPUT, pendingRequests.toTypedArray())
+
+                val request = OneTimeWorkRequestBuilder<DifferRequestWorker>()
+                    .setConstraints(CONSTRAINTS)
+                    .setInputData(data.build())
+                    .build()
+
+                WorkManager.getInstance(this).enqueue(request)
+                WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
+                    .observe(this, { workInfo ->
+                        if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                            requestResultTextView.text = workInfo.outputData.getString(KEY_RESULT).toString()
+                            pendingRequests.clear()
+                            Toast.makeText(applicationContext, getString(R.string.cached_req_done), Toast.LENGTH_SHORT).show()
+                        }
+                    })
+            }
+            return@setOnClickListener
+        }
     }
 
-    // TODO: test this
     private fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
