@@ -39,6 +39,7 @@ class CompressActivity : AppCompatActivity() {
             }
 
             mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain", true)
+            return@setOnClickListener
         }
     }
 }
