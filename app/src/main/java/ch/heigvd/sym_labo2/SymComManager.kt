@@ -2,8 +2,6 @@ package ch.heigvd.sym_labo2
 
 import android.os.Handler
 import android.os.Looper
-import android.os.StrictMode
-import android.util.Log
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.InputStream
@@ -30,17 +28,13 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
     fun sendRequest(url: String, request: ByteArray, contentType: String, compress: Boolean = false) {
         val thread = Thread {
-
-            // TODO: Gérer les potentielles excption (sur les streams)
-            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-            StrictMode.setThreadPolicy(policy)
+            // TODO: Gérer les potentielles exceptions (sur les streams)
 
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "POST";
             connection.setRequestProperty("Content-Type", contentType)
 
             val outputStream : OutputStream
-
             if (compress) {
                 connection.setRequestProperty("X-Network", "CSD")
                 connection.setRequestProperty("X-Content-Encoding", "deflate")
@@ -56,7 +50,6 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
             // Handle response
             val inputStream : InputStream
-
             if (compress) {
                 inputStream = InflaterInputStream(connection.inputStream, Inflater(true))
 
@@ -64,14 +57,12 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
                 inputStream = DataInputStream(connection.inputStream)
             }
 
-
             val response = inputStream.readBytes()
             inputStream.close()
 
-            //I use handler to edit something in the main thead because you cant edit ui from another thread
-            handler.post(Runnable {
+            handler.post {
                 communicationEventListener?.handleServerResponse(response)
-            })
+            }
         }
         thread.start()
     }

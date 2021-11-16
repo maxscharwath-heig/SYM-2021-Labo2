@@ -1,8 +1,6 @@
 package ch.heigvd.sym_labo2
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
@@ -20,14 +18,13 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
     }
 
     override fun doWork(): Result {
-
         val retrievedRequests = inputData.getStringArray(KEY_INPUT)
 
         if (retrievedRequests != null) {
             for (req in retrievedRequests) {
                 try {
                     Log.d("Trying to send", req)
-                    val result = sendRequest("http://mobile.iict.ch/api/txt", req)
+                    val result = sendRequest(req)
                     val output: Data = workDataOf(KEY_RESULT to result)
                     return Result.success(output)
 
@@ -40,10 +37,10 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
         return Result.success()
     }
 
-    private fun sendRequest(url: String, request: String): String {
+    private fun sendRequest(request: String): String {
         val data = request.toByteArray(StandardCharsets.UTF_8)
 
-        val connection = URL(url).openConnection() as HttpURLConnection
+        val connection = URL("http://mobile.iict.ch/api/txt").openConnection() as HttpURLConnection
         connection.requestMethod = "POST";
         connection.setRequestProperty("Content-Type", "text/plain")
         connection.setRequestProperty("Content-Length", data.size.toString())

@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import java.nio.charset.StandardCharsets
-import java.util.zip.DeflaterOutputStream
 
 class CompressActivity : AppCompatActivity() {
 
@@ -25,7 +23,6 @@ class CompressActivity : AppCompatActivity() {
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
-                // TODO: deflate with InflaterInputStream
                 requestResultTextView.text = response.decodeToString()
             }
         })

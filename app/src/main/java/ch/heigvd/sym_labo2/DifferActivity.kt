@@ -1,12 +1,9 @@
 package ch.heigvd.sym_labo2
 
-import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.net.ConnectivityManager
-import android.os.StrictMode
 import android.widget.Toast
 import androidx.work.*
 import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_INPUT
@@ -47,40 +44,25 @@ class DifferActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            if (isNetworkAvailable(applicationContext)) {
-                // Internet is available, sending request directly
-                mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain")
+            pendingRequests.add(content)
+            val data = Data.Builder().putStringArray(KEY_INPUT, pendingRequests.toTypedArray())
 
-            } else {
-                Toast.makeText(applicationContext, getString(R.string.no_network_warn), Toast.LENGTH_SHORT).show()
+            val request = OneTimeWorkRequestBuilder<DifferRequestWorker>()
+                .setConstraints(CONSTRAINTS)
+                .setInputData(data.build())
+                .build()
 
-                pendingRequests.add(content)
-                val data = Data.Builder().putStringArray(KEY_INPUT, pendingRequests.toTypedArray())
+            WorkManager.getInstance(this).enqueue(request)
+            WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
+                .observe(this, { workInfo ->
+                    if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        requestResultTextView.text = workInfo.outputData.getString(KEY_RESULT).toString()
+                        pendingRequests.clear()
+                        Toast.makeText(applicationContext, getString(R.string.cached_req_done), Toast.LENGTH_SHORT).show()
+                    }
+                })
 
-                val request = OneTimeWorkRequestBuilder<DifferRequestWorker>()
-                    .setConstraints(CONSTRAINTS)
-                    .setInputData(data.build())
-                    .build()
-
-                WorkManager.getInstance(this).enqueue(request)
-                WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
-                    .observe(this, { workInfo ->
-                        if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                            requestResultTextView.text = workInfo.outputData.getString(KEY_RESULT).toString()
-                            pendingRequests.clear()
-                            Toast.makeText(applicationContext, getString(R.string.cached_req_done), Toast.LENGTH_SHORT).show()
-                        }
-                    })
-            }
             return@setOnClickListener
         }
-    }
-
-    private fun isNetworkAvailable(context: Context): Boolean {
-        val connectivityManager =
-            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val capabilities =
-            connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-        return capabilities != null
     }
 }
