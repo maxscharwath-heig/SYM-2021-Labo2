@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import ch.heigvd.sym_labo2.model.Author
+import ch.heigvd.sym_labo2.model.Book
 import com.google.gson.Gson
 
 class GraphqlActivity : AppCompatActivity() {
@@ -13,27 +15,6 @@ class GraphqlActivity : AppCompatActivity() {
 
     data class Query(val query: String);
 
-    data class Book(
-        val id: String,
-        val title: String,
-        val isbn13: String,
-        val languageCode: String,
-        val numPages: Int,
-        val publicationDate: String,
-        val publisher: String,
-        val textReviewsCount: Int,
-        val averageRating: Float
-    ) {
-        override fun toString(): String {
-            return title
-        }
-    }
-
-    data class Author(val id: String, val name: String, val books: ArrayList<Book>) {
-        override fun toString(): String {
-            return name
-        }
-    };
     data class AuthorsResponse(
         val data: Data,
     ) {
@@ -66,7 +47,7 @@ class GraphqlActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val author = authorSpinner.getItemAtPosition(position) as Author;
-                getAuthorBooks(author.id);
+                if(author.id != null) getAuthorBooks(author.id);
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -84,7 +65,7 @@ class GraphqlActivity : AppCompatActivity() {
             }
         })
 
-        val json = Gson().toJson(Query("{authors:findAllAuthors{id, name, books{id}}}"))
+        val json = Gson().toJson(Query("{authors:findAllAuthors{id, name}}"))
         mcm.sendRequest("http://mobile.iict.ch/graphql", json.toByteArray(), "application/json")
     }
 
@@ -92,24 +73,21 @@ class GraphqlActivity : AppCompatActivity() {
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
                 val result = Gson().fromJson(response.decodeToString(), AuthorResponse::class.java)
+                val books = result.data.author.books ?: ArrayList()
                 Toast.makeText(
                     applicationContext,
-                    "Found ${result.data.author.books.size} books",
+                    "Found ${books.size} books",
                     Toast.LENGTH_SHORT
                 ).show()
                 val adapter: ArrayAdapter<Book> = ArrayAdapter(
                     this@GraphqlActivity,
                     android.R.layout.simple_list_item_1,
-                    result.data.author.books
+                    books
                 )
                 bookListView.adapter = adapter;
-                bookListView.setOnItemClickListener { parent, view, position, id ->
-                    val book = bookListView.getItemAtPosition(position) as Book;
-                }
-
             }
         })
-        val json = Gson().toJson(Query("{author:findAuthorById(id: $authorId){books{id, title}}}"))
+        val json = Gson().toJson(Query("{author:findAuthorById(id: $authorId){books{title}}}"))
 
         mcm.sendRequest("http://mobile.iict.ch/graphql",json.toByteArray(), "application/json")
     }
