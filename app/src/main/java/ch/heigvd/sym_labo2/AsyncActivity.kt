@@ -22,8 +22,8 @@ class AsyncActivity : AppCompatActivity() {
 
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
-                requestResultTextView.text = response
+            override fun handleServerResponse(response: ByteArray) {
+                requestResultTextView.text = response.decodeToString()
             }
         })
 
@@ -35,7 +35,7 @@ class AsyncActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
+            mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain")
             return@setOnClickListener
         }
     }

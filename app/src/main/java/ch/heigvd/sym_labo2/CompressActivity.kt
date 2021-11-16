@@ -24,9 +24,9 @@ class CompressActivity : AppCompatActivity() {
 
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
+            override fun handleServerResponse(response: ByteArray) {
                 // TODO: deflate with InflaterInputStream
-                requestResultTextView.text = response
+                requestResultTextView.text = response.decodeToString()
             }
         })
 
@@ -38,7 +38,7 @@ class CompressActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain", true)
+            mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain", true)
             return@setOnClickListener
         }
     }

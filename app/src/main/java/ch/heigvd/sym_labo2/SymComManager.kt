@@ -28,14 +28,12 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
         this.communicationEventListener = communicationEventListener
     }
 
-    fun sendRequest(url: String, request: String, contentType: String, compress: Boolean = false) {
+    fun sendRequest(url: String, request: ByteArray, contentType: String, compress: Boolean = false) {
         val thread = Thread {
 
             // TODO: Gérer les potentielles excption (sur les streams)
             val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
             StrictMode.setThreadPolicy(policy)
-
-            val data = request.toByteArray(CHARSET)
 
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = "POST";
@@ -52,7 +50,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
                 outputStream = DataOutputStream(connection.outputStream)
             }
 
-            outputStream.write(data)
+            outputStream.write(request)
             outputStream.flush()
             outputStream.close()
 
@@ -67,7 +65,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
             }
 
 
-            val response = inputStream.bufferedReader(CHARSET).readText()
+            val response = inputStream.readBytes()
             inputStream.close()
 
             //I use handler to edit something in the main thead because you cant edit ui from another thread

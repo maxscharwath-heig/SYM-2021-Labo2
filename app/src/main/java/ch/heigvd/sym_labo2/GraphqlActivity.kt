@@ -72,8 +72,8 @@ class GraphqlActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
         mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
-                val result = Gson().fromJson(response, AuthorsResponse::class.java)
+            override fun handleServerResponse(response: ByteArray) {
+                val result = Gson().fromJson(response.decodeToString(), AuthorsResponse::class.java)
                 authorAdapter.clear();
                 authorAdapter.addAll(result.data.authors);
                 Toast.makeText(
@@ -85,13 +85,13 @@ class GraphqlActivity : AppCompatActivity() {
         })
 
         val json = Gson().toJson(Query("{authors:findAllAuthors{id, name, books{id}}}"))
-        mcm.sendRequest("http://mobile.iict.ch/graphql", json, "application/json")
+        mcm.sendRequest("http://mobile.iict.ch/graphql", json.toByteArray(), "application/json")
     }
 
     private fun getAuthorBooks(authorId:String){
         mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
-                val result = Gson().fromJson(response, AuthorResponse::class.java)
+            override fun handleServerResponse(response: ByteArray) {
+                val result = Gson().fromJson(response.decodeToString(), AuthorResponse::class.java)
                 Toast.makeText(
                     applicationContext,
                     "Found ${result.data.author.books.size} books",
@@ -111,6 +111,6 @@ class GraphqlActivity : AppCompatActivity() {
         })
         val json = Gson().toJson(Query("{author:findAuthorById(id: $authorId){books{id, title}}}"))
 
-        mcm.sendRequest("http://mobile.iict.ch/graphql",json, "application/json")
+        mcm.sendRequest("http://mobile.iict.ch/graphql",json.toByteArray(), "application/json")
     }
 }

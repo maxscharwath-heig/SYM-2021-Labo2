@@ -79,9 +79,9 @@ class SerializeActivity : AppCompatActivity() {
                         person.phones[0].number, person.phones[1].number, person.phones[2].number))
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
-                        override fun handleServerResponse(response: String) {
+                        override fun handleServerResponse(response: ByteArray) {
 
-                            val jsonResult = Json.decodeFromString<Data>(response)
+                            val jsonResult = Json.decodeFromString<Data>(response.decodeToString())
 
                             var resultPerson = ch.heigvd.sym_labo2.model.Person(jsonResult.name
                                 , jsonResult.firstName,
@@ -104,7 +104,7 @@ class SerializeActivity : AppCompatActivity() {
                         }
                     })
 
-                    mcm.sendRequest("http://mobile.iict.ch/api/json", json, "application/json")
+                    mcm.sendRequest("http://mobile.iict.ch/api/json", json.toByteArray(), "application/json")
 
                 }
                 spinner.selectedItem.toString() == stringArray[1] -> {
@@ -120,11 +120,11 @@ class SerializeActivity : AppCompatActivity() {
                     var toSend = writer.toString()
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
-                        override fun handleServerResponse(response: String) {
+                        override fun handleServerResponse(response: ByteArray) {
                             val docb = DocumentBuilderFactory.newInstance()
                             val doc = docb.newDocumentBuilder()
                             val input = InputSource()
-                            input.setCharacterStream(StringReader(response))
+                            input.setCharacterStream(StringReader(response.decodeToString()))
                             val d = doc.parse(input)
                             val nameElements = d.getElementsByTagName("name")
                             val firstNameElements = d.getElementsByTagName("firstname")
@@ -150,7 +150,7 @@ class SerializeActivity : AppCompatActivity() {
                             result.text = resultPerson.toString()
                         }
                     })
-                    mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend , "application/xml")
+                    mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend.toByteArray() , "application/xml")
                 }
                 spinner.selectedItem.toString() == stringArray[2] -> {
 
@@ -184,8 +184,8 @@ class SerializeActivity : AppCompatActivity() {
 
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
-                        override fun handleServerResponse(response: String) {
-                            val resultProtoDirectory = DirectoryOuterClass.Directory.parseFrom(response.encodeToByteArray())
+                        override fun handleServerResponse(response: ByteArray) {
+                            val resultProtoDirectory = DirectoryOuterClass.Directory.parseFrom(response)
 
                             val resultProtoPerson = resultProtoDirectory.resultsList[0]
 
@@ -193,22 +193,22 @@ class SerializeActivity : AppCompatActivity() {
                                 mutableListOf(
                                     Phone(
                                         resultProtoPerson.phoneList[0].number,
-                                        Phone.Type.valueOf(resultProtoPerson.phoneList[0].type.name)
+                                        Phone.Type.valueOf(resultProtoPerson.phoneList[0].type.name.lowercase())
                                     ),
                                     Phone(
                                         resultProtoPerson.phoneList[1].number,
-                                        Phone.Type.valueOf(resultProtoPerson.phoneList[1].type.name)
+                                        Phone.Type.valueOf(resultProtoPerson.phoneList[1].type.name.lowercase())
                                     ),
                                     Phone(
                                         resultProtoPerson.phoneList[2].number,
-                                        Phone.Type.valueOf(resultProtoPerson.phoneList[2].type.name)
+                                        Phone.Type.valueOf(resultProtoPerson.phoneList[2].type.name.lowercase())
                                     ),
                                 )
                             )
                             result.text = resultPerson.toString()
                         }
                     })
-                    mcm.sendRequest("http://mobile.iict.ch/api/protobuf", toSend.toString() , "application/protobuf")
+                    mcm.sendRequest("http://mobile.iict.ch/api/protobuf", toSend , "application/protobuf")
 
                 }
             }

@@ -34,8 +34,8 @@ class DifferActivity : AppCompatActivity() {
 
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
-            override fun handleServerResponse(response: String) {
-                requestResultTextView.text = response
+            override fun handleServerResponse(response: ByteArray) {
+                requestResultTextView.text = response.decodeToString()
             }
         })
 
@@ -49,7 +49,7 @@ class DifferActivity : AppCompatActivity() {
 
             if (isNetworkAvailable(applicationContext)) {
                 // Internet is available, sending request directly
-                mcm.sendRequest("http://mobile.iict.ch/api/txt", content, "text/plain")
+                mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain")
 
             } else {
                 Toast.makeText(applicationContext, getString(R.string.no_network_warn), Toast.LENGTH_SHORT).show()
