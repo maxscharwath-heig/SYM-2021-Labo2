@@ -11,24 +11,15 @@ import kotlinx.serialization.encodeToString
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
-import kotlinx.serialization.decodeFromString
-
+import ch.heigvd.sym_labo2.model.Directory
+import ch.heigvd.sym_labo2.model.Person
 import ch.heigvd.sym_labo2.model.Phone
 import java.io.StringWriter
-
 import javax.xml.parsers.DocumentBuilderFactory
 import ch.heigvd.sym_labo2.protobuf.DirectoryOuterClass
-
+import com.google.gson.Gson
 import java.io.StringReader
-
 import org.xml.sax.InputSource
-
-
-
-
-
-
-
 
 class SerializeActivity : AppCompatActivity() {
 
@@ -41,9 +32,6 @@ class SerializeActivity : AppCompatActivity() {
     private lateinit var dataPhone3 : EditText
     private lateinit var result : TextView
     private lateinit var spinner : Spinner
-
-    @Serializable
-    data class Data(val name: String, val firstName: String, val phone1: String, val phone2: String, val phone3: String)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,38 +53,42 @@ class SerializeActivity : AppCompatActivity() {
         val stringArray = resources.getStringArray(R.array.data_array)
 
         sendBtn.setOnClickListener {
-            var person = ch.heigvd.sym_labo2.model.Person(dataName.text.toString()
-                , dataFirstName.text.toString(),
-                mutableListOf(Phone(dataPhone1.text.toString(),
-                    Phone.Type.home), Phone(dataPhone2.text.toString(),
-                    Phone.Type.mobile), Phone(dataPhone3.text.toString(),
-                    Phone.Type.work)
-                ))
+            val person = Person(
+                dataName.text.toString(),
+                dataFirstName.text.toString(),
+                mutableListOf(
+                    Phone(dataPhone1.text.toString(), Phone.Type.home),
+                    Phone(dataPhone2.text.toString(),Phone.Type.mobile),
+                    Phone(dataPhone3.text.toString(),Phone.Type.work)))
+
+            val directory = Directory(mutableListOf(person))
+
             when {
+                //Json
                 spinner.selectedItem.toString() == stringArray[0] -> {
 
-                    val json = Json.encodeToString(Data(person.name, person.firstName,
-                        person.phones[0].number, person.phones[1].number, person.phones[2].number))
+                    val json = Gson().toJson(person)
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
                         override fun handleServerResponse(response: ByteArray) {
 
-                            val jsonResult = Json.decodeFromString<Data>(response.decodeToString())
+                            val jsonResult = Gson().fromJson(response.decodeToString(), Person::class.java)
 
-                            var resultPerson = ch.heigvd.sym_labo2.model.Person(jsonResult.name
-                                , jsonResult.firstName,
+                            var resultPerson = Person(
+                                jsonResult.name,
+                                jsonResult.firstName,
                                 mutableListOf(
                                     Phone(
-                                        jsonResult.phone1,
-                                        Phone.Type.home
+                                        jsonResult.phones[0].number,
+                                        jsonResult.phones[0].type
                                     ),
                                     Phone(
-                                        jsonResult.phone2,
-                                        Phone.Type.mobile
+                                        jsonResult.phones[1].number,
+                                        jsonResult.phones[1].type
                                     ),
                                     Phone(
-                                        jsonResult.phone3,
-                                        Phone.Type.work,
+                                        jsonResult.phones[2].number,
+                                        jsonResult.phones[2].type
                                     )
                                 )
                             )
@@ -107,6 +99,7 @@ class SerializeActivity : AppCompatActivity() {
                     mcm.sendRequest("http://mobile.iict.ch/api/json", json.toByteArray(), "application/json")
 
                 }
+                //XML
                 spinner.selectedItem.toString() == stringArray[1] -> {
                     val xmlSerializer = Xml.newSerializer()
                     val writer = StringWriter()
@@ -130,7 +123,7 @@ class SerializeActivity : AppCompatActivity() {
                             val firstNameElements = d.getElementsByTagName("firstname")
                             val phoneElements = d.getElementsByTagName("phone")
 
-                            var resultPerson = ch.heigvd.sym_labo2.model.Person(nameElements.item(0).textContent
+                            var resultPerson = Person(nameElements.item(0).textContent
                                 , firstNameElements.item(0).textContent,
                                 mutableListOf(
                                     Phone(
@@ -152,6 +145,7 @@ class SerializeActivity : AppCompatActivity() {
                     })
                     mcm.sendRequest("http://mobile.iict.ch/api/xml", toSend.toByteArray() , "application/xml")
                 }
+                //ProtoBuf
                 spinner.selectedItem.toString() == stringArray[2] -> {
 
                     val protoDirectoryBuilder = DirectoryOuterClass.Directory.newBuilder()
@@ -186,9 +180,7 @@ class SerializeActivity : AppCompatActivity() {
                     mcm.setCommunicationListener(object : CommunicationEventListener {
                         override fun handleServerResponse(response: ByteArray) {
                             val resultProtoDirectory = DirectoryOuterClass.Directory.parseFrom(response)
-
                             val resultProtoPerson = resultProtoDirectory.resultsList[0]
-
                             var resultPerson = ch.heigvd.sym_labo2.model.Person(resultProtoPerson.name, resultProtoPerson.firstname,
                                 mutableListOf(
                                     Phone(

@@ -1,12 +1,9 @@
 package ch.heigvd.sym_labo2.model
 
-import android.util.Xml
+import kotlinx.serialization.Serializable
 import org.xmlpull.v1.XmlSerializer
-import java.io.StringWriter
 
-
-//TODO dataclass?
-class Person(val name:String, val firstName: String, val phones: List<Phone>) {
+data class Person(val name:String, val firstName: String, val phones: MutableList<Phone>) {
 
     override fun toString(): String {
 
@@ -30,12 +27,11 @@ class Person(val name:String, val firstName: String, val phones: List<Phone>) {
         xmlSerializer.text(firstName)
         xmlSerializer.endTag("", "firstname")
         for (phone in phones) {
-            xmlSerializer.startTag("","phone")
-            xmlSerializer.attribute("", "type", phone.type.name)
-            xmlSerializer.text(phone.number)
-            xmlSerializer.endTag("","phone")
+            phone.toXml(xmlSerializer)
         }
         xmlSerializer.endTag("", "person")
     }
+
+
 
 }
