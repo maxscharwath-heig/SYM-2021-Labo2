@@ -1,7 +1,6 @@
 package ch.heigvd.sym_labo2
 
 import android.content.Context
-import android.util.Log
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -10,6 +9,8 @@ import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import ch.heigvd.sym_labo2.DifferActivity.Companion.URL
+import ch.heigvd.sym_labo2.DifferActivity.Companion.CONTENT_TYPE
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
     companion object {
@@ -22,15 +23,13 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
 
         if (retrievedRequests != null) {
             for (req in retrievedRequests) {
-                try {
-                    Log.d("Trying to send", req)
+                return try {
                     val result = sendRequest(req)
                     val output: Data = workDataOf(KEY_RESULT to result)
-                    return Result.success(output)
+                    Result.success(output)
 
                 } catch (e : Exception) {
-                    Log.d("failed", e.toString())
-                    return Result.retry()
+                    Result.retry()
                 }
             }
         }
@@ -40,14 +39,15 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
     private fun sendRequest(request: String): String {
         val data = request.toByteArray(StandardCharsets.UTF_8)
 
-        val connection = URL("http://mobile.iict.ch/api/txt").openConnection() as HttpURLConnection
+        val connection = URL(URL).openConnection() as HttpURLConnection
         connection.requestMethod = "POST";
-        connection.setRequestProperty("Content-Type", "text/plain")
+        connection.setRequestProperty("Content-Type", CONTENT_TYPE)
         connection.setRequestProperty("Content-Length", data.size.toString())
 
         val outputStream = DataOutputStream(connection.outputStream)
         outputStream.write(data)
         outputStream.flush()
+
         val responseReader = connection.inputStream.bufferedReader()
         return responseReader.readText();
     }

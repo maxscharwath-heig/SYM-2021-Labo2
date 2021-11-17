@@ -12,6 +12,11 @@ class AsyncActivity : AppCompatActivity() {
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
 
+    companion object {
+        const val URL: String = "http://mobile.iict.ch/api/txt"
+        const val CONTENT_TYPE: String = "text/plain"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_async)
@@ -35,7 +40,7 @@ class AsyncActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain")
+            mcm.sendRequest(URL, content.toByteArray(), CONTENT_TYPE)
             return@setOnClickListener
         }
     }

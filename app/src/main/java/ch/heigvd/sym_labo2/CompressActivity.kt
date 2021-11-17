@@ -12,6 +12,11 @@ class CompressActivity : AppCompatActivity() {
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
 
+    companion object {
+        const val URL: String = "http://mobile.iict.ch/api/txt"
+        const val CONTENT_TYPE: String = "text/plain"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_compress)
@@ -35,7 +40,7 @@ class CompressActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain", true)
+            mcm.sendRequest(URL, content.toByteArray(), CONTENT_TYPE, true)
             return@setOnClickListener
         }
     }

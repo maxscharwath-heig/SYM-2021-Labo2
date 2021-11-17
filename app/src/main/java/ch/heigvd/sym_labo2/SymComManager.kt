@@ -8,7 +8,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.Inflater
@@ -17,7 +16,7 @@ import java.util.zip.InflaterInputStream
 class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
 
     companion object {
-        val CHARSET = StandardCharsets.UTF_8
+        const val REQ_METHOD = "POST"
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -28,10 +27,9 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
     fun sendRequest(url: String, request: ByteArray, contentType: String, compress: Boolean = false) {
         val thread = Thread {
-            // TODO: Gérer les potentielles exceptions (sur les streams)
 
             val connection = URL(url).openConnection() as HttpURLConnection
-            connection.requestMethod = "POST";
+            connection.requestMethod = REQ_METHOD;
             connection.setRequestProperty("Content-Type", contentType)
 
             val outputStream : OutputStream

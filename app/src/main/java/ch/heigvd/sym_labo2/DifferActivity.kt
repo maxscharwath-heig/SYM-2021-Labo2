@@ -9,7 +9,6 @@ import androidx.work.*
 import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_INPUT
 import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_RESULT
 
-
 class DifferActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
     private lateinit var requestContentTextView: TextView
@@ -19,6 +18,8 @@ class DifferActivity : AppCompatActivity() {
 
     companion object {
         val CONSTRAINTS = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        const val URL: String = "http://mobile.iict.ch/api/txt"
+        const val CONTENT_TYPE: String = "text/plain"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
