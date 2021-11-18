@@ -9,12 +9,12 @@ import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import ch.heigvd.sym_labo2.DifferActivity.Companion.URL
-import ch.heigvd.sym_labo2.DifferActivity.Companion.CONTENT_TYPE
+import ch.heigvd.sym_labo2.com.SymComManager
 
-class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
-    companion object {
-        const val KEY_INPUT  = "requests"
+class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
+    Worker(appContext, workerParams) {
+    companion object { //TODO C'est sensé être un companion ça ? ça peut pas juste être un const ?
+        const val KEY_INPUT = "requests"
         const val KEY_RESULT = "result"
     }
 
@@ -28,7 +28,7 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
                     val output: Data = workDataOf(KEY_RESULT to result)
                     Result.success(output)
 
-                } catch (e : Exception) {
+                } catch (e: Exception) {
                     Result.retry()
                 }
             }
@@ -39,9 +39,9 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
     private fun sendRequest(request: String): String {
         val data = request.toByteArray(StandardCharsets.UTF_8)
 
-        val connection = URL(URL).openConnection() as HttpURLConnection
+        val connection = URL(SymComManager.URL_TEXT).openConnection() as HttpURLConnection
         connection.requestMethod = "POST";
-        connection.setRequestProperty("Content-Type", CONTENT_TYPE)
+        connection.setRequestProperty("Content-Type", SymComManager.CONTENT_TYPE_TEXT)
         connection.setRequestProperty("Content-Length", data.size.toString())
 
         val outputStream = DataOutputStream(connection.outputStream)

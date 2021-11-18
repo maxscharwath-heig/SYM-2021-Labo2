@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var asyncBtn : Button
-    private lateinit var differBtn : Button
-    private lateinit var serializeBtn : Button
-    private lateinit var compressBtn : Button
-    private lateinit var graphqlBtn : Button
+    private lateinit var asyncBtn: Button
+    private lateinit var differBtn: Button
+    private lateinit var serializeBtn: Button
+    private lateinit var compressBtn: Button
+    private lateinit var graphqlBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

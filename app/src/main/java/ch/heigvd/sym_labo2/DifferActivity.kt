@@ -8,6 +8,8 @@ import android.widget.Toast
 import androidx.work.*
 import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_INPUT
 import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_RESULT
+import ch.heigvd.sym_labo2.com.CommunicationEventListener
+import ch.heigvd.sym_labo2.com.SymComManager
 
 class DifferActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
@@ -16,10 +18,9 @@ class DifferActivity : AppCompatActivity() {
 
     private var pendingRequests = mutableListOf<String>()
 
-    companion object {
-        val CONSTRAINTS = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
-        const val URL: String = "http://mobile.iict.ch/api/txt"
-        const val CONTENT_TYPE: String = "text/plain"
+    companion object { //TODO C'est sensé être un companion ça ? ça peut pas juste être un const ?
+        val CONSTRAINTS =
+            Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +42,11 @@ class DifferActivity : AppCompatActivity() {
             val content = requestContentTextView.text.toString()
 
             if (content.isBlank()) {
-                Toast.makeText(applicationContext, getString(R.string.blank_input), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.blank_input),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -57,9 +62,14 @@ class DifferActivity : AppCompatActivity() {
             WorkManager.getInstance(this).getWorkInfoByIdLiveData(request.id)
                 .observe(this, { workInfo ->
                     if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED) {
-                        requestResultTextView.text = workInfo.outputData.getString(KEY_RESULT).toString()
+                        requestResultTextView.text =
+                            workInfo.outputData.getString(KEY_RESULT).toString()
                         pendingRequests.clear()
-                        Toast.makeText(applicationContext, getString(R.string.cached_req_done), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            applicationContext,
+                            getString(R.string.cached_req_done),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 })
 

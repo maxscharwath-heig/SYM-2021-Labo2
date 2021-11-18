@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import ch.heigvd.sym_labo2.com.CommunicationEventListener
+import ch.heigvd.sym_labo2.com.SymComManager
 import ch.heigvd.sym_labo2.model.Author
 import ch.heigvd.sym_labo2.model.Book
 import com.google.gson.Gson
@@ -12,11 +14,6 @@ class GraphqlActivity : AppCompatActivity() {
     private lateinit var authorSpinner: Spinner
     private lateinit var bookListView: ListView
     private val mcm: SymComManager = SymComManager()
-
-    companion object {
-        const val URL: String = "http://mobile.iict.ch/graphql"
-        const val CONTENT_TYPE: String = "application/json"
-    }
 
     data class Query(val query: String)
 
@@ -45,7 +42,7 @@ class GraphqlActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val author = authorSpinner.getItemAtPosition(position) as Author
-                if(author.id != null) getAuthorBooks(author.id)
+                if (author.id != null) getAuthorBooks(author.id)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -94,6 +91,10 @@ class GraphqlActivity : AppCompatActivity() {
 
     private fun sendQuery(queryString: String) {
         val json = Gson().toJson(Query(queryString))
-        mcm.sendRequest(URL,json.toByteArray(), CONTENT_TYPE)
+        mcm.sendRequest(
+            SymComManager.URL_GRAPHQL,
+            json.toByteArray(),
+            SymComManager.CONTENT_TYPE_JSON
+        )
     }
 }
