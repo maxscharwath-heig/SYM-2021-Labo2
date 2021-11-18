@@ -1,4 +1,4 @@
-package ch.heigvd.sym_labo2
+package ch.heigvd.sym_labo2.com
 
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +17,18 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
     companion object {
         const val REQ_METHOD = "POST"
+
+        const val URL_TEXT: String = "http://mobile.iict.ch/api/txt"
+
+        const val URL_JSON: String = "http://mobile.iict.ch/api/json"
+        const val URL_XML: String = "http://mobile.iict.ch/api/xml"
+        const val URL_PROTOBUF: String = "http://mobile.iict.ch/api/protobuf"
+        const val URL_GRAPHQL: String = "http://mobile.iict.ch/graphql"
+
+        const val CONTENT_TYPE_TEXT: String = "text/plain"
+        const val CONTENT_TYPE_JSON: String = "application/json"
+        const val CONTENT_TYPE_XML: String = "application/xml"
+        const val CONTENT_TYPE_PROTOBUF: String = "application/protobuf"
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -25,21 +37,27 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
         this.communicationEventListener = communicationEventListener
     }
 
-    fun sendRequest(url: String, request: ByteArray, contentType: String, compress: Boolean = false) {
+    fun sendRequest(
+        url: String,
+        request: ByteArray,
+        contentType: String,
+        compress: Boolean = false
+    ) {
         val thread = Thread {
 
             val connection = URL(url).openConnection() as HttpURLConnection
             connection.requestMethod = REQ_METHOD;
             connection.setRequestProperty("Content-Type", contentType)
 
-            val outputStream : OutputStream
-            if (compress) {
+            val outputStream: OutputStream = if (compress) {
                 connection.setRequestProperty("X-Network", "CSD")
                 connection.setRequestProperty("X-Content-Encoding", "deflate")
-                outputStream = DeflaterOutputStream(connection.outputStream, Deflater(Deflater.DEFAULT_COMPRESSION, true))
-            }
-            else {
-                outputStream = DataOutputStream(connection.outputStream)
+                DeflaterOutputStream(
+                    connection.outputStream,
+                    Deflater(Deflater.DEFAULT_COMPRESSION, true)
+                )
+            } else {
+                DataOutputStream(connection.outputStream)
             }
 
             outputStream.write(request)
@@ -47,12 +65,10 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
             outputStream.close()
 
             // Handle response
-            val inputStream : InputStream
-            if (compress) {
-                inputStream = InflaterInputStream(connection.inputStream, Inflater(true))
-
+            val inputStream: InputStream = if (compress) {
+                InflaterInputStream(connection.inputStream, Inflater(true))
             } else {
-                inputStream = DataInputStream(connection.inputStream)
+                DataInputStream(connection.inputStream)
             }
 
             val response = inputStream.readBytes()

@@ -5,17 +5,14 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import ch.heigvd.sym_labo2.com.CommunicationEventListener
+import ch.heigvd.sym_labo2.com.SymComManager
 
 class CompressActivity : AppCompatActivity() {
 
     private lateinit var sendButton: Button
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
-
-    companion object {
-        const val URL: String = "http://mobile.iict.ch/api/txt"
-        const val CONTENT_TYPE: String = "text/plain"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +33,18 @@ class CompressActivity : AppCompatActivity() {
             val content = requestContentTextView.text.toString()
 
             if (content.isBlank()) {
-                Toast.makeText(applicationContext, getString(R.string.blank_input), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    applicationContext,
+                    getString(R.string.blank_input),
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
-            mcm.sendRequest(URL, content.toByteArray(), CONTENT_TYPE, true)
+            mcm.sendRequest(
+                SymComManager.URL_TEXT, content.toByteArray(),
+                SymComManager.CONTENT_TYPE_TEXT, true
+            )
             return@setOnClickListener
         }
     }
