@@ -12,23 +12,19 @@ import org.xmlpull.v1.XmlSerializer
  * @author Teo Ferrari
  * @author Maxime Scharwath
  */
-class Phone( //TODO voir pour private
-    val number: String,
-    val type: Type
-) {
+data class Phone(val number: String, val type: Type) {
     enum class Type {
         //@SerializedName necessary for enum parsing from gson, in this case it sends
         // the value and gets either the value or one of the alternates
         @SerializedName("home", alternate = ["home MODIFIED"])
-        home, //TODO majuscule ?
+        HOME,
 
         @SerializedName("mobile", alternate = ["mobile MODIFIED"])
-        mobile,
+        MOBILE,
 
         @SerializedName("work", alternate = ["work MODIFIED"])
-        work;
+        WORK;
     }
-
 
     override fun toString(): String {
         return type.name + " : " + number
@@ -40,7 +36,7 @@ class Phone( //TODO voir pour private
      */
     fun toXml(xmlSerializer: XmlSerializer) {
         xmlSerializer.startTag("", "phone")
-        xmlSerializer.attribute("", "type", type.name)
+        xmlSerializer.attribute("", "type", type.name.lowercase())
         xmlSerializer.text(number)
         xmlSerializer.endTag("", "phone")
     }
@@ -51,7 +47,7 @@ class Phone( //TODO voir pour private
      */
     fun toProtobuf(): DirectoryOuterClass.Phone? {
         return DirectoryOuterClass.Phone.newBuilder()
-            .setType(DirectoryOuterClass.Phone.Type.valueOf(type.name.uppercase()))
+            .setType(DirectoryOuterClass.Phone.Type.valueOf(type.name))
             .setNumber(number).build()
     }
 }

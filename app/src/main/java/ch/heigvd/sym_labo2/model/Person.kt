@@ -16,8 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  * @author Teo Ferrari
  * @author Maxime Scharwath
  */
-class Person(val name: String, val firstName: String, val phones: List<Phone>) {//TODO voir pour private
-
+data class Person(val name: String, val firstName: String, val phones: List<Phone>) {
 
     override fun toString(): String {
         var s: String = "Name: " + name +
@@ -93,15 +92,18 @@ class Person(val name: String, val firstName: String, val phones: List<Phone>) {
                 mutableListOf(
                     Phone(
                         phoneElements.item(0).textContent,
-                        Phone.Type.valueOf(phoneElements.item(0).attributes.item(0).textContent)
+                        Phone.Type.valueOf(phoneElements.item(0).
+                        attributes.item(0).textContent.uppercase())
                     ),
                     Phone(
                         phoneElements.item(1).textContent,
-                        Phone.Type.valueOf(phoneElements.item(1).attributes.item(0).textContent)
+                        Phone.Type.valueOf(phoneElements.item(1).
+                        attributes.item(0).textContent.uppercase())
                     ),
                     Phone(
                         phoneElements.item(2).textContent,
-                        Phone.Type.valueOf(phoneElements.item(2).attributes.item(0).textContent)
+                        Phone.Type.valueOf(phoneElements.item(2).
+                        attributes.item(0).textContent.uppercase())
                     )
                 )
             )
@@ -120,15 +122,15 @@ class Person(val name: String, val firstName: String, val phones: List<Phone>) {
                 mutableListOf(
                     Phone(
                         resultProtoPerson.phoneList[0].number,
-                        Phone.Type.valueOf(resultProtoPerson.phoneList[0].type.name.lowercase())
+                        Phone.Type.valueOf(resultProtoPerson.phoneList[0].type.name)
                     ),
                     Phone(
                         resultProtoPerson.phoneList[1].number,
-                        Phone.Type.valueOf(resultProtoPerson.phoneList[1].type.name.lowercase())
+                        Phone.Type.valueOf(resultProtoPerson.phoneList[1].type.name)
                     ),
                     Phone(
                         resultProtoPerson.phoneList[2].number,
-                        Phone.Type.valueOf(resultProtoPerson.phoneList[2].type.name.lowercase())
+                        Phone.Type.valueOf(resultProtoPerson.phoneList[2].type.name)
                     )
                 )
             )

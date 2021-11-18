@@ -11,7 +11,7 @@ import org.xmlpull.v1.XmlSerializer
  * @author Teo Ferrari
  * @author Maxime Scharwath
  */
-class Directory(val persons: MutableList<Person>) {//TODO voir pour private
+data class Directory(val persons: MutableList<Person>) {
 
     /**
      * Serializes the directory to XML using the XmlSerializer

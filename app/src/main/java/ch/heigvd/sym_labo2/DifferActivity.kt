@@ -18,7 +18,7 @@ class DifferActivity : AppCompatActivity() {
 
     private var pendingRequests = mutableListOf<String>()
 
-    companion object { //TODO C'est sensé être un companion ça ? ça peut pas juste être un const ?
+    companion object {
         val CONSTRAINTS =
             Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
     }

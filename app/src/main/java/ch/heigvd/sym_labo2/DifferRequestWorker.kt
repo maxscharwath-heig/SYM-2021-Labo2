@@ -13,7 +13,7 @@ import ch.heigvd.sym_labo2.com.SymComManager
 
 class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
     Worker(appContext, workerParams) {
-    companion object { //TODO C'est sensé être un companion ça ? ça peut pas juste être un const ?
+    companion object {
         const val KEY_INPUT = "requests"
         const val KEY_RESULT = "result"
     }

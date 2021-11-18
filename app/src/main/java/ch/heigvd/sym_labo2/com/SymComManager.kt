@@ -19,7 +19,6 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
         const val REQ_METHOD = "POST"
 
         const val URL_TEXT: String = "http://mobile.iict.ch/api/txt"
-
         const val URL_JSON: String = "http://mobile.iict.ch/api/json"
         const val URL_XML: String = "http://mobile.iict.ch/api/xml"
         const val URL_PROTOBUF: String = "http://mobile.iict.ch/api/protobuf"

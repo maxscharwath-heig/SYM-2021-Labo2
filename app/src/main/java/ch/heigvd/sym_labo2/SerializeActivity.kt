@@ -48,10 +48,6 @@ class SerializeActivity : AppCompatActivity() {
         result = findViewById(R.id.result)
         spinner = findViewById(R.id.spinner)
 
-        //TODO wtf is this
-        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-        StrictMode.setThreadPolicy(policy)
-
         val mcm = SymComManager()
         val stringArray = resources.getStringArray(R.array.data_array)
 
@@ -63,9 +59,9 @@ class SerializeActivity : AppCompatActivity() {
                 dataName.text.toString(),
                 dataFirstName.text.toString(),
                 mutableListOf(
-                    Phone(dataPhone1.text.toString(), Phone.Type.home),
-                    Phone(dataPhone2.text.toString(), Phone.Type.mobile),
-                    Phone(dataPhone3.text.toString(), Phone.Type.work)
+                    Phone(dataPhone1.text.toString(), Phone.Type.HOME),
+                    Phone(dataPhone2.text.toString(), Phone.Type.MOBILE),
+                    Phone(dataPhone3.text.toString(), Phone.Type.WORK)
                 )
             )
 
@@ -102,7 +98,7 @@ class SerializeActivity : AppCompatActivity() {
                     val xmlSerializer = Xml.newSerializer()
                     val writer = StringWriter()
                     xmlSerializer.setOutput(writer)
-                    xmlSerializer.startDocument("UTF-8", false) //TODO consts ?
+                    xmlSerializer.startDocument("UTF-8", false)
                     xmlSerializer.docdecl(" directory SYSTEM \"http://mobile.iict.ch/directory.dtd\"")
                     directory.toXml(xmlSerializer)
                     xmlSerializer.endDocument()
@@ -129,7 +125,7 @@ class SerializeActivity : AppCompatActivity() {
 
                     mcm.setCommunicationListener(object : CommunicationEventListener {
                         override fun handleServerResponse(response: ByteArray) {
-                            ////Parsing of Xml using classes functions
+                            //Parsing of Xml using classes functions
                             result.text = Person.fromProtobuf(response).toString()
                         }
                     })
