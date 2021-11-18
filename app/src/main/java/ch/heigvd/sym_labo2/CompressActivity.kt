@@ -5,14 +5,17 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import java.nio.charset.StandardCharsets
-import java.util.zip.DeflaterOutputStream
 
 class CompressActivity : AppCompatActivity() {
 
     private lateinit var sendButton: Button
     private lateinit var requestContentTextView: TextView
     private lateinit var requestResultTextView: TextView
+
+    companion object {
+        const val URL: String = "http://mobile.iict.ch/api/txt"
+        const val CONTENT_TYPE: String = "text/plain"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +28,6 @@ class CompressActivity : AppCompatActivity() {
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
-                // TODO: deflate with InflaterInputStream
                 requestResultTextView.text = response.decodeToString()
             }
         })
@@ -38,7 +40,7 @@ class CompressActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            mcm.sendRequest("http://mobile.iict.ch/api/txt", content.toByteArray(), "text/plain", true)
+            mcm.sendRequest(URL, content.toByteArray(), CONTENT_TYPE, true)
             return@setOnClickListener
         }
     }

@@ -2,15 +2,12 @@ package ch.heigvd.sym_labo2
 
 import android.os.Handler
 import android.os.Looper
-import android.os.StrictMode
-import android.util.Log
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.nio.charset.StandardCharsets
 import java.util.zip.Deflater
 import java.util.zip.DeflaterOutputStream
 import java.util.zip.Inflater
@@ -19,7 +16,7 @@ import java.util.zip.InflaterInputStream
 class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
 
     companion object {
-        val CHARSET = StandardCharsets.UTF_8
+        const val REQ_METHOD = "POST"
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -31,16 +28,11 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
     fun sendRequest(url: String, request: ByteArray, contentType: String, compress: Boolean = false) {
         val thread = Thread {
 
-            // TODO: Gérer les potentielles excption (sur les streams)
-            val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
-            StrictMode.setThreadPolicy(policy)
-
             val connection = URL(url).openConnection() as HttpURLConnection
-            connection.requestMethod = "POST";
+            connection.requestMethod = REQ_METHOD;
             connection.setRequestProperty("Content-Type", contentType)
 
             val outputStream : OutputStream
-
             if (compress) {
                 connection.setRequestProperty("X-Network", "CSD")
                 connection.setRequestProperty("X-Content-Encoding", "deflate")
@@ -56,7 +48,6 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
             // Handle response
             val inputStream : InputStream
-
             if (compress) {
                 inputStream = InflaterInputStream(connection.inputStream, Inflater(true))
 
@@ -64,14 +55,12 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
                 inputStream = DataInputStream(connection.inputStream)
             }
 
-
             val response = inputStream.readBytes()
             inputStream.close()
 
-            //I use handler to edit something in the main thead because you cant edit ui from another thread
-            handler.post(Runnable {
+            handler.post {
                 communicationEventListener?.handleServerResponse(response)
-            })
+            }
         }
         thread.start()
     }
