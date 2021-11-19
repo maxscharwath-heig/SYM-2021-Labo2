@@ -5,6 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 
+/**
+ * Main activity containing links to many demonstrating activities
+ * @author Nicolas Crausaz
+ * @author Teo Ferrari
+ * @author Maxime Scharwath
+ */
 class MainActivity : AppCompatActivity() {
     private lateinit var asyncBtn: Button
     private lateinit var differBtn: Button

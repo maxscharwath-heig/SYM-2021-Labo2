@@ -8,6 +8,12 @@ import android.widget.Toast
 import ch.heigvd.sym_labo2.com.CommunicationEventListener
 import ch.heigvd.sym_labo2.com.SymComManager
 
+/**
+ * Activity demonstrating a simple asynchronous request
+ * @author Nicolas Crausaz
+ * @author Teo Ferrari
+ * @author Maxime Scharwath
+ */
 class AsyncActivity : AppCompatActivity() {
 
     private lateinit var sendButton: Button
@@ -22,6 +28,7 @@ class AsyncActivity : AppCompatActivity() {
         requestContentTextView = findViewById(R.id.request_content_text)
         requestResultTextView = findViewById(R.id.request_result_text)
 
+        // Defining request's return behaviour
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
@@ -32,6 +39,7 @@ class AsyncActivity : AppCompatActivity() {
         sendButton.setOnClickListener {
             val content = requestContentTextView.text.toString()
 
+            // Content validation
             if (content.isBlank()) {
                 Toast.makeText(
                     applicationContext,

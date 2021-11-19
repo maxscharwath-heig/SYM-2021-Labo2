@@ -45,7 +45,7 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
         val thread = Thread {
 
             val connection = URL(url).openConnection() as HttpURLConnection
-            connection.requestMethod = REQ_METHOD;
+            connection.requestMethod = REQ_METHOD
             connection.setRequestProperty("Content-Type", contentType)
 
             val outputStream: OutputStream = if (compress) {

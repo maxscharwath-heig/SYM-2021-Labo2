@@ -10,6 +10,12 @@ import ch.heigvd.sym_labo2.model.Author
 import ch.heigvd.sym_labo2.model.Book
 import com.google.gson.Gson
 
+/**
+ * Activity demonstrating GraphQL client requests
+ * @author Nicolas Crausaz
+ * @author Teo Ferrari
+ * @author Maxime Scharwath
+ */
 class GraphqlActivity : AppCompatActivity() {
     private lateinit var authorSpinner: Spinner
     private lateinit var bookListView: ListView

@@ -11,6 +11,12 @@ import ch.heigvd.sym_labo2.DifferRequestWorker.Companion.KEY_RESULT
 import ch.heigvd.sym_labo2.com.CommunicationEventListener
 import ch.heigvd.sym_labo2.com.SymComManager
 
+/**
+ * Activity demonstrating a differed request using WorkManager
+ * @author Nicolas Crausaz
+ * @author Teo Ferrari
+ * @author Maxime Scharwath
+ */
 class DifferActivity : AppCompatActivity() {
     private lateinit var sendButton: Button
     private lateinit var requestContentTextView: TextView
@@ -19,7 +25,7 @@ class DifferActivity : AppCompatActivity() {
     private var pendingRequests = mutableListOf<String>()
 
     companion object {
-        val CONSTRAINTS =
+        private val CONSTRAINTS =
             Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
     }
 
@@ -31,6 +37,7 @@ class DifferActivity : AppCompatActivity() {
         requestContentTextView = findViewById(R.id.request_content_text)
         requestResultTextView = findViewById(R.id.request_result_text)
 
+        // Defining request's return behaviour
         val mcm = SymComManager()
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
@@ -41,6 +48,7 @@ class DifferActivity : AppCompatActivity() {
         sendButton.setOnClickListener {
             val content = requestContentTextView.text.toString()
 
+            // Content validation
             if (content.isBlank()) {
                 Toast.makeText(
                     applicationContext,

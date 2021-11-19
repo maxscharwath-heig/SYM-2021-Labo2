@@ -92,18 +92,21 @@ data class Person(val name: String, val firstName: String, val phones: List<Phon
                 mutableListOf(
                     Phone(
                         phoneElements.item(0).textContent,
-                        Phone.Type.valueOf(phoneElements.item(0).
-                        attributes.item(0).textContent.uppercase())
+                        Phone.Type.valueOf(
+                            phoneElements.item(0).attributes.item(0).textContent.uppercase()
+                        )
                     ),
                     Phone(
                         phoneElements.item(1).textContent,
-                        Phone.Type.valueOf(phoneElements.item(1).
-                        attributes.item(0).textContent.uppercase())
+                        Phone.Type.valueOf(
+                            phoneElements.item(1).attributes.item(0).textContent.uppercase()
+                        )
                     ),
                     Phone(
                         phoneElements.item(2).textContent,
-                        Phone.Type.valueOf(phoneElements.item(2).
-                        attributes.item(0).textContent.uppercase())
+                        Phone.Type.valueOf(
+                            phoneElements.item(2).attributes.item(0).textContent.uppercase()
+                        )
                     )
                 )
             )
