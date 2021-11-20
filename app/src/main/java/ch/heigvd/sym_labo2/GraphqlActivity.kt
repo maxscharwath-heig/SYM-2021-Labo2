@@ -36,6 +36,8 @@ class GraphqlActivity : AppCompatActivity() {
         setContentView(R.layout.activity_graphql)
         authorSpinner = findViewById(R.id.spinner_author)
         bookListView = findViewById(R.id.list_book)
+
+        // Define the adapter for the author spinner
         val authorAdapter = ArrayAdapter<Author>(
             this@GraphqlActivity, android.R.layout.simple_list_item_1
         )
@@ -54,6 +56,7 @@ class GraphqlActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
+        // Get authors
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
                 val result = Gson().fromJson(response.decodeToString(), AuthorsResponse::class.java)
@@ -71,6 +74,11 @@ class GraphqlActivity : AppCompatActivity() {
         sendQuery("{authors:findAllAuthors{id, name}}")
     }
 
+    /**
+     * Retrieve author's book
+     *
+     * @param authorId Author's id
+     */
     private fun getAuthorBooks(authorId: String) {
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
@@ -95,6 +103,11 @@ class GraphqlActivity : AppCompatActivity() {
         sendQuery("{author:findAuthorById(id: $authorId){books{title}}}")
     }
 
+    /**
+     * Send GraphQL query
+     *
+     * @param queryString GraphQL query
+     */
     private fun sendQuery(queryString: String) {
         val json = Gson().toJson(Query(queryString))
         mcm.sendRequest(

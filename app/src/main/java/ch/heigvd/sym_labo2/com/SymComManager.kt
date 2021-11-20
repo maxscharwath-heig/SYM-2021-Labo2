@@ -13,16 +13,20 @@ import java.util.zip.DeflaterOutputStream
 import java.util.zip.Inflater
 import java.util.zip.InflaterInputStream
 
+/**
+ * Class that manages requests sending to server's endpoints
+ */
 class SymComManager(private var communicationEventListener: CommunicationEventListener? = null) {
 
     companion object {
-        const val REQ_METHOD = "POST"
+        private const val REQ_METHOD = "POST"
+        private const val ENDPOINT = "http://mobile.iict.ch/api"
 
-        const val URL_TEXT: String = "http://mobile.iict.ch/api/txt"
-        const val URL_JSON: String = "http://mobile.iict.ch/api/json"
-        const val URL_XML: String = "http://mobile.iict.ch/api/xml"
-        const val URL_PROTOBUF: String = "http://mobile.iict.ch/api/protobuf"
-        const val URL_GRAPHQL: String = "http://mobile.iict.ch/graphql"
+        const val URL_TEXT: String = "${ENDPOINT}/txt"
+        const val URL_JSON: String = "${ENDPOINT}/json"
+        const val URL_XML: String = "${ENDPOINT}/xml"
+        const val URL_PROTOBUF: String = "${ENDPOINT}/protobuf"
+        const val URL_GRAPHQL: String = "${ENDPOINT}/graphql"
 
         const val CONTENT_TYPE_TEXT: String = "text/plain"
         const val CONTENT_TYPE_JSON: String = "application/json"
@@ -32,10 +36,21 @@ class SymComManager(private var communicationEventListener: CommunicationEventLi
 
     private val handler = Handler(Looper.getMainLooper())
 
+    /**
+     * Set response behaviour
+     */
     fun setCommunicationListener(communicationEventListener: CommunicationEventListener) {
         this.communicationEventListener = communicationEventListener
     }
 
+    /**
+     * Send request
+     *
+     * @param url Endpoint to reach
+     * @param request Request content
+     * @param contentType Type of content
+     * @param compress Enable deflate compression
+     */
     fun sendRequest(
         url: String,
         request: ByteArray,

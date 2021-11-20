@@ -1,5 +1,12 @@
 package ch.heigvd.sym_labo2.model
 
+/**
+ * Class that represents an Book
+ *
+ * @author Nicolas Crausaz
+ * @author Teo Ferrari
+ * @author Maxime Scharwath
+ */
 data class Book(
     val id: String?,
     val title: String?,

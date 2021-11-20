@@ -44,6 +44,11 @@ class DifferRequestWorker(appContext: Context, workerParams: WorkerParameters) :
         return Result.success()
     }
 
+    /**
+     * Send request to endpoint
+     *
+     * @param request Request content
+     */
     private fun sendRequest(request: String): String {
         val data = request.toByteArray(StandardCharsets.UTF_8)
 
