@@ -2,7 +2,7 @@ package ch.heigvd.sym_labo2.model
 
 /**
  * Class that represents an Book
- *
+ * @remarks All fields can be null because this class is using by GraphQL
  * @author Nicolas Crausaz
  * @author Teo Ferrari
  * @author Maxime Scharwath

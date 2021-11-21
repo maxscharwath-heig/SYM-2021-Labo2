@@ -59,6 +59,7 @@ class GraphqlActivity : AppCompatActivity() {
         // Get authors
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
+                //use GSON to parse json response by using the AuthorResponse'Model
                 val result = Gson().fromJson(response.decodeToString(), AuthorsResponse::class.java)
                 authorAdapter.clear()
                 authorAdapter.addAll(result.data.authors)
@@ -70,7 +71,7 @@ class GraphqlActivity : AppCompatActivity() {
                 ).show()
             }
         })
-
+        //get all author but only id and name to avoid overfetching
         sendQuery("{authors:findAllAuthors{id, name}}")
     }
 
@@ -83,6 +84,7 @@ class GraphqlActivity : AppCompatActivity() {
         mcm.setCommunicationListener(object : CommunicationEventListener {
             override fun handleServerResponse(response: ByteArray) {
                 val result = Gson().fromJson(response.decodeToString(), AuthorResponse::class.java)
+                //because we put nullish possibility to each field we check that.
                 val books = result.data.author.books ?: ArrayList()
 
                 Toast.makeText(
@@ -99,14 +101,14 @@ class GraphqlActivity : AppCompatActivity() {
                 bookListView.adapter = adapter
             }
         })
-
+        //get only author's book's title
         sendQuery("{author:findAuthorById(id: $authorId){books{title}}}")
     }
 
     /**
      * Send GraphQL query
      *
-     * @param queryString GraphQL query
+     * @param queryString GraphQL query only
      */
     private fun sendQuery(queryString: String) {
         val json = Gson().toJson(Query(queryString))
